@@ -22,14 +22,8 @@ const userSchema = mongoose.Schema({
     mob_no: {
         type: Number,
         required: true
-    },
-    isActive:{
-        type:Boolean,
-        required:true,
-        default:true
     }
 }, { timestamps: true });
 
 const User = mongoose.model('User', userSchema);
-
 export default User;

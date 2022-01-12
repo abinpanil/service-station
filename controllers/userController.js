@@ -2,10 +2,11 @@ import User from '../models/userModel.js';
 import asyncHandler from 'express-async-handler';
 import bcrypt from 'bcryptjs';
 import mongoose from 'mongoose';
+import generateToken from '../utils/generateToken.js';
 
 
 // @desc Auth user and get token
-// @route POST /users/login
+// @route POST /user/login
 // @access Public
 const authUser = asyncHandler(async (req, res) => {
     const { username, password } = req.body;
@@ -28,6 +29,14 @@ const authUser = asyncHandler(async (req, res) => {
         res.status(400)
         throw new Error('Wrong Password');
     }
+    res.json({
+        _id:user._id,
+        name:user.name,
+        username:user.username,
+        email:user.email_id,
+        mobile:user.mob_no,
+        token: generateToken(user._id)
+    });
 })
 
 
@@ -57,9 +66,17 @@ const registerUser = asyncHandler(async (req, res) => {
 
     // save user to database
     const newUser = new User({
-        username, passwordHash, name, email, mobile
+        username, passwordHash, name, email_id:email, mob_no:mobile
     })
-    const saveUser = await newUser.save();
+    const user = await newUser.save();
+    res.json({
+        _id:user._id,
+        name:user.name,
+        username:user.username,
+        email:user.email_id,
+        mobile:user.mob_no,
+        token: generateToken(user._id)
+    })
     
 })
 

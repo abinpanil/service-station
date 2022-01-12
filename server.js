@@ -1,8 +1,9 @@
 import express from "express";
 import dotenv from 'dotenv';
-import connectDB from './config/db.js'
-import userRoutes from './routes/userRoutes.js'
-import {notFound, errorHandler} from './middleware/errorMiddleware.js'
+import connectDB from './config/db.js';
+import userRoutes from './routes/userRoutes.js';
+import customerRoutes from './routes/customerRoutes.js';
+import {notFound, errorHandler} from './middleware/errorMiddleware.js';
 
 dotenv.config();
 
@@ -16,6 +17,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use('/user', userRoutes);
+app.use('/customer', customerRoutes);
 
 app.use(notFound);
 app.use(errorHandler);
