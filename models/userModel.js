@@ -1,5 +1,4 @@
 import mongoose from 'mongoose';
-import bcrypt from 'bcryptjs';
 
 const userSchema = mongoose.Schema({
     username: {
@@ -7,7 +6,7 @@ const userSchema = mongoose.Schema({
         required: true,
         unique: true
     },
-    password: {
+    passwordHash: {
         type: String,
         required: true
     },
@@ -23,7 +22,14 @@ const userSchema = mongoose.Schema({
     mob_no: {
         type: Number,
         required: true
+    },
+    isActive:{
+        type:Boolean,
+        required:true,
+        default:true
     }
 }, { timestamps: true });
 
-module.exports = mongoose.model('User', userSchema);
+const User = mongoose.model('User', userSchema);
+
+export default User;
