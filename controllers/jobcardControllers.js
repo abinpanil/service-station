@@ -17,7 +17,6 @@ const createJobcard = asyncHandler(async (req, res) => {
     const newJobcard = new Jobcard({
         creation_user: user_id, customer_id, reg_no, vehicle_make, vehicle_model
     })
-    console.log(newJobcard);
     const jobcard = await newJobcard.save();
 
     res.json(jobcard);
