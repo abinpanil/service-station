@@ -1,5 +1,6 @@
 import User from '../models/userModel.js';
 import asyncHandler from 'express-async-handler';
+import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import mongoose from 'mongoose';
 import generateToken from '../utils/generateToken.js';
@@ -25,17 +26,23 @@ const authUser = asyncHandler(async (req, res) => {
         throw new Error('User not found');
     }
     const passwordCheck = await bcrypt.compare(password, user.passwordHash);
-    if(!passwordCheck){
+    if (!passwordCheck) {
         res.status(400)
         throw new Error('Wrong Password');
     }
+
+
+    const token = generateToken(user._id);
+    res.cookie('token', token, {
+        httpOnly: true
+    })
     res.json({
-        _id:user._id,
-        name:user.name,
-        username:user.username,
-        email:user.email_id,
-        mobile:user.mob_no,
-        token: generateToken(user._id)
+        _id: user._id,
+        name: user.name,
+        username: user.username,
+        email: user.email_id,
+        mobile: user.mob_no,
+        token: token
     });
 })
 
@@ -44,18 +51,18 @@ const authUser = asyncHandler(async (req, res) => {
 // @Route Post /user/register
 // @access Public
 const registerUser = asyncHandler(async (req, res) => {
-    const {username, password, verifyPassword, name, email, mobile} = req.body;
+    const { username, password, verifyPassword, name, email, mobile } = req.body;
 
-    if(!username || !password || !verifyPassword || !name || !email || !mobile){
+    if (!username || !password || !verifyPassword || !name || !email || !mobile) {
         res.status(400)
         throw new Error('Fill all fields');
     }
-    if(password != verifyPassword){
+    if (password != verifyPassword) {
         res.status(400)
         throw new Error('Password doesnt match');
     }
     const existingUser = await User.findOne({ username })
-    if(existingUser){
+    if (existingUser) {
         res.status(400)
         throw new Error('Username already exists');
     }
@@ -66,22 +73,36 @@ const registerUser = asyncHandler(async (req, res) => {
 
     // save user to database
     const newUser = new User({
-        username, passwordHash, name, email_id:email, mob_no:mobile
+        username, passwordHash, name, email_id: email, mob_no: mobile
     })
     const user = await newUser.save();
-    res.json({
-        _id:user._id,
-        name:user.name,
-        username:user.username,
-        email:user.email_id,
-        mobile:user.mob_no,
-        token: generateToken(user._id)
+
+    const token = generateToken(user._id);
+    res.cookie('token', token, {
+        httpOnly: true
     })
-    
+    res.json({
+        _id: user._id,
+        name: user.name,
+        username: user.username,
+        email: user.email_id,
+        mobile: user.mob_no,
+        token: token
+    })
+
 })
 
+// @desc Logout user
+// @Route Post /user/logout
+// @access Public
+const logoutUser = asyncHandler((req, res) => {
+    res.cookie('token', '', {
+        httpOnly: true
+    }).send();
+})
 
 export {
     authUser,
-    registerUser
+    registerUser,
+    logoutUser
 }
