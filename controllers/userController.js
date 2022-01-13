@@ -61,7 +61,7 @@ const registerUser = asyncHandler(async (req, res) => {
         res.status(400)
         throw new Error('Password doesnt match');
     }
-    const existingUser = await User.findOne({ username })
+    const existingUser = await User.exists({ username }) 
     if (existingUser) {
         res.status(400)
         throw new Error('Username already exists');

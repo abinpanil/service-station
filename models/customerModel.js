@@ -10,12 +10,12 @@ const customerSchema = mongoose.Schema({
         required: true,
         unique: true
     },
-    isActive:{
-        type:Boolean,
-        required:true,
-        default:true
+    isActive: {
+        type: Boolean,
+        required: true,
+        default: true
     }
 }, { timestamps: true });
 
-const Customer = mongoose.model('Customer',customerSchema);
+const Customer = mongoose.model('Customer', customerSchema);
 export default Customer;

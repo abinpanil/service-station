@@ -16,7 +16,7 @@ const createCustomer = asyncHandler(async (req, res) => {
         res.status(400);
         throw new Error('Mobile number is mandatory');
     }
-    const existingMobile = await Customer.findOne({ mobile_no: mobile });
+    const existingMobile = await Customer.exists({ mobile_no: mobile });
     if (existingMobile) {
         res.status(400);
         throw new Error('Mobile number already exists');
