@@ -1,5 +1,8 @@
 import Jobcard from "../models/jobcardModel.js";
 import asyncHandler from "express-async-handler";
+import mongoose from 'mongoose';
+
+const ObjectId = mongoose.Types.ObjectId;
 
 
 // @desc Create new Jobcard
@@ -7,7 +10,7 @@ import asyncHandler from "express-async-handler";
 // @access Private
 const createJobcard = asyncHandler(async (req, res) => {
     const { user_id, customer_id, reg_no, vehicle_make, vehicle_model } = req.body;
-    
+
     if (!user_id || !customer_id || !reg_no || !vehicle_make || !vehicle_model) {
         res.status(401)
         throw new Error('Fill all fields');
@@ -37,7 +40,7 @@ const getJobcard = asyncHandler(async (req, res) => {
 
     const jobcard = await Jobcard.aggregate([
         {
-            $match: { customer_id: customer_id, isActive: true }
+            $match: { customer_id: ObjectId(customer_id), isActive: true }
         }
     ]);
     if (!jobcard) {
@@ -56,7 +59,7 @@ const getJobcard = asyncHandler(async (req, res) => {
 const deleteJobcard = asyncHandler(async (req, res) => {
     const { jobcard_id } = req.query;
 
-    const deleteJobcard = await Jobcard.updateOne({ _id: jobcard_id }, { isActive: false });
+    const deleteJobcard = await Jobcard.updateOne({ _id: ObjectId(jobcard_id) }, { isActive: false });
     res.json(deleteJobcard);
 })
 
@@ -66,23 +69,24 @@ const deleteJobcard = asyncHandler(async (req, res) => {
 // @access private
 const changeJobStatus = asyncHandler(async (req, res) => {
     const { user_id, jobcard_id, status } = req.body;
+    const date = new Date();
 
     let changeStatus
 
-    if (status === 1) changeStatus = await Jobcard.updateOne({ _id: jobcard_id }, {
-        completion_date: () => new Date(),
+    if (status === 1) changeStatus = await Jobcard.updateOne({ _id: ObjectId(jobcard_id) }, {
+        completion_date: date,
         completion_user: user_id,
         jobcard_status: status
     })
 
     if (status === 2) {
-        const jobcard = await Jobcard.findOne({ jobcard_id });
+        const jobcard = await Jobcard.findOne({ _id: ObjectId(jobcard_id) });
         if (jobcard.payable_amount != 0) {
             res.status(401)
             throw new Error('Complete payment before delivery');
         }
-        changeStatus = await Jobcard.updateOne({ _id: jobcard_id }, {
-            delivery_date: () => new Date(),
+        changeStatus = await Jobcard.updateOne({ _id: ObjectId(jobcard_id) }, {
+            delivery_date: () => Date.now(),
             delivery_date: user_id,
             jobcard_status: status
         })
@@ -92,11 +96,12 @@ const changeJobStatus = asyncHandler(async (req, res) => {
 })
 
 
+
 export {
 
     createJobcard,
     getJobcard,
     deleteJobcard,
-    changeJobStatus
+    changeJobStatus,
 
 }

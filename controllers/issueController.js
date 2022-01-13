@@ -1,5 +1,8 @@
 import Issue from "../models/issueModel.js";
 import asyncHandler from "express-async-handler";
+import mongoose from 'mongoose';
+
+const ObjectId = mongoose.Types.ObjectId;
 
 
 // @desc Add new Issue
@@ -12,17 +15,17 @@ const addIssue = asyncHandler(async (req, res) => {
         res.status(401)
         throw new Error('Description must fill');
     }
-    if(!remarks){
+    if (!remarks) {
         res.status(401)
         throw new Error('Remarks must fill');
     }
-    if(!user_id || !jobcard_id){
+    if (!user_id || !jobcard_id) {
         res.status(401)
         throw new Error('Values missing');
     }
 
     const newIssue = new Issue({
-        user:user_id, jobcard_id, description, remarks
+        user: user_id, jobcard_id, description, remarks
     })
     const issue = await newIssue.save();
 
@@ -36,15 +39,15 @@ const addIssue = asyncHandler(async (req, res) => {
 // @access Private
 const getIssue = asyncHandler(async (req, res) => {
     const { jobcard_id } = req.query;
-
-    if(!jobcard_id){
+    console.log(jobcard_id);
+    if (!jobcard_id) {
         res.status(401)
         throw new Error('Values missing');
     }
 
     const issue = await Issue.aggregate([
         {
-            $match:{jobcard_id:jobcard_id, isActive:true}
+            $match: { jobcard_id: ObjectId(jobcard_id), isActive:true }
         }
     ]);
 
@@ -58,7 +61,7 @@ const getIssue = asyncHandler(async (req, res) => {
 const deleteIssue = asyncHandler(async (req, res) => {
     const { issue_id } = req.query;
 
-    const deleteIssue = await Issue.updateOne({_id:issue_id}, {isActive:false});
+    const deleteIssue = await Issue.updateOne({ _id: ObjectId(issue_id) }, { $set: { isActive: false } });
     res.json(deleteIssue);
 })
 

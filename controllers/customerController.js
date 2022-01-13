@@ -1,6 +1,8 @@
 import Customer from '../models/customerModel.js';
 import asyncHandler from 'express-async-handler';
+import mongoose from 'mongoose';
 
+const ObjectId = mongoose.Types.ObjectId;
 
 // @desc Create new Customer
 // @route POST /customer
@@ -63,8 +65,8 @@ const getCustomer = asyncHandler(async (req, res) => {
 // @access Private
 const deleteCustomer = asyncHandler(async (req, res) => {
     let { id } = req.query;
-    console.log(id);
-    const deleteCustomer = await Customer.updateOne({_id:id},{isActive:false});
+    
+    const deleteCustomer = await Customer.updateOne({ _id: ObjectId(id) }, { isActive: false });
     res.json(deleteCustomer);
 })
 
