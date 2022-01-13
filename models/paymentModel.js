@@ -8,7 +8,16 @@ const paymentSchema = mongoose.Schema({
     },
     amount: {
         type: Number
+    },
+    user: {
+        type: Schema.Types.ObjectId,
+        ref: "User"
+    },
+    isActive: {
+        type: Boolean,
+        default: true
     }
+
 }, { timestamps: true })
 
 const Payment = mongoose.model('Payment', paymentSchema);

@@ -12,7 +12,16 @@ const issueSchema = mongoose.Schema({
     },
     remarks: {
         type: String
+    },
+    user: {
+        type: Schema.Types.ObjectId,
+        ref: "User"
+    },
+    isActive: {
+        type: Boolean,
+        default: true
     }
+
 }, { timestamps: true })
 
 const Issue = mongoose.model('Issue', issueSchema);

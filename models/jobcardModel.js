@@ -1,46 +1,65 @@
-import mongoose, { SchemaTypes } from 'mongoose';
+import mongoose from 'mongoose';
+const {Schema} = mongoose;
 
 const jobcardSchema = mongoose.Schema({
     customer_id: {
         type: Schema.Types.ObjectId,
         ref: "Customer",
-        required: true
     },
     reg_no: {
         type: String,
-        required: true,
     },
     vehicle_make: {
         type: String,
-        required: true
     },
     vehicle_model: {
         type: String,
-        required: true
     },
     jobcard_status: {
         type: Number,
         default: 0,
-        required: true
     },
-    creation_date: () => new Date(),
+    creation_date:{
+      type:Date,
+      default: () => Date.now(),  
+    },
+    creation_user: {
+        type: Schema.Types.ObjectId,
+        ref: "User"
+    },
     completion_date: {
         type: Date
+    },
+    completion_user: {
+        type: Schema.Types.ObjectId,
+        ref: "User"
     },
     delivery_date: {
         type: Date
     },
+    delivery_user: {
+        type: Schema.Types.ObjectId,
+        ref: "User"
+    },
     total_amount: {
-        type: Number
+        type: Number,
+        default:0
     },
     discount: {
-        type: Number
+        type: Number,
+        default:0
     },
     payable_amount: {
-        type: Number
+        type: Number,
+        default:0
     },
     recieved_amount: {
-        type: Number
+        type: Number,
+        default:0
+    },
+    isActive: {
+        type: Boolean,
+        default: true
     }
 
 })
