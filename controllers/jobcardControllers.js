@@ -1,6 +1,7 @@
 import Jobcard from "../models/jobcardModel.js";
 import asyncHandler from "express-async-handler";
 import mongoose from 'mongoose';
+import Customer from "../models/customerModel.js";
 
 const ObjectId = mongoose.Types.ObjectId;
 
@@ -9,16 +10,28 @@ const ObjectId = mongoose.Types.ObjectId;
 // @Route POST /jobcard
 // @access Private
 const createJobcard = asyncHandler(async (req, res) => {
-    const { user_id, customer_id, reg_no, vehicle_make, vehicle_model } = req.body;
+    const { name, mobile, user_id, reg_no, vehicle_make, vehicle_model } = req.body;
 
-    if (!user_id || !customer_id || !reg_no || !vehicle_make || !vehicle_model) {
+    if (!name || !mobile || !user_id || !reg_no || !vehicle_make || !vehicle_model) {
         res.status(401)
         throw new Error('Fill all fields');
     }
-    console.log(user_id, customer_id, reg_no, vehicle_make, vehicle_model);
+
+    let customer = await Customer.findOne({ name: name, mobile_no: mobile });
+    if (!customer) {
+        const existingMobile = await Customer.exists({ mobile_no: mobile });
+        if (existingMobile) {
+            res.status(400);
+            throw new Error('Mobile number is alreay used another customer');
+        }
+        const newCustomer = new Customer({
+            name, mobile_no: mobile
+        });
+        customer = await newCustomer.save();
+    }
 
     const newJobcard = new Jobcard({
-        creation_user: user_id, customer_id, reg_no, vehicle_make, vehicle_model
+        creation_user: user_id, customer_id: customer._id, reg_no, vehicle_make, vehicle_model
     })
     const jobcard = await newJobcard.save();
 

@@ -35,37 +35,33 @@ const createCustomer = asyncHandler(async (req, res) => {
 // @access Private
 const getCustomer = asyncHandler(async (req, res) => {
     let { name, mobile } = req.query;
-    mobile = parseInt(mobile);
-    if (!name) name = ""
-    if (!mobile) mobile = ""
+    let customer
+    if (!name && mobile) {
 
-    const customer = await Customer.aggregate([
-        {
-            $match: {
-                $or: [
-                    { mobile_no: mobile },
-                    { name: { $regex: name, $options: 'i' } }
-                ]
-            }
-        },
-        {
-            $match: { isActive: true }
-        }
-    ])
-    if (!customer.length) {
+        mobile = parseInt(mobile);
+        customer = await Customer.find({ mobile_no: mobile, isActive: true });
+    }
+    if (!mobile && name) {
+        customer = await Customer.find({ name: name, isActive: true });
+    }
+    if (mobile && name) {
+
+        mobile = parseInt(mobile);
+        customer = await Customer.findOne({ mobile_no: mobile, name: name, isActive: true });
+    }
+    if (!customer) {
         res.status(401)
         throw new Error('Customer not found');
     }
-
     res.json(customer);
 });
 
-// @desc Fetch customer
+// @desc Delete customer
 // @route DELETE /customer
 // @access Private
 const deleteCustomer = asyncHandler(async (req, res) => {
     let { id } = req.query;
-    
+
     const deleteCustomer = await Customer.updateOne({ _id: ObjectId(id) }, { isActive: false });
     res.json(deleteCustomer);
 })
